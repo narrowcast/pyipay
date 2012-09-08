@@ -6,12 +6,25 @@ import suds
 # Auction's iPay API endpoint
 api_base = 'https://api.auction.co.kr/ArcheSystem/IpayService.asmx?wsdl'
 
+class AddAttributePlugin(suds.plugin.MessagePlugin):
+    """Plugin to add the item_option_name attribute to the IpayServiceItems."""
+    def marshalled(self, context):
+        body = context.envelope.getChild('Body')
+        if body[0].name == 'InsertIpayOrder':
+            for item in body[0][1]:
+                if item.get('item_option_name') is None:
+                    # Then set an empty item_option_name
+                    item.set('item_option_name', '')
+
 class IpayAPI(object):
     """A client for the Auction iPay API."""
     
     def __init__(self, seller_id, ipay_key):
         self.seller_id = seller_id
-        self.client = suds.client.Client(api_base, faults=False)
+        self.client = suds.client.Client(
+            api_base, faults=False, plugins=[AddAttributePlugin()]
+        )
+        # Manual setting of soap header is required due to an iPay bug
         xmlns = ('s2', 'http://www.auction.co.kr/Security')
         ticket = suds.sax.element.Element('EncryptedTicket', ns=xmlns)
         value = suds.sax.element.Element('Value', ns=xmlns).setText(ipay_key)
