@@ -2,10 +2,10 @@ from distutils.core import setup
 
 setup (
     name='pyipay',
-    version='0.1.0',
+    version='0.1.1',
     author='Chee-Hyung Yoon',
     author_email='yoon@tikkon.com',
-    package=['pyipay',],
+    packages=['pyipay',],
     url='http://pypi.python.org/pypi/pyipay/',
     license='LICENSE.txt',
     description='A Python library for accessing the Auction iPay API',
